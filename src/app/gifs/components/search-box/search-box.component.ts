@@ -32,6 +32,8 @@ export class SearchBoxComponent {
     //limpiamos el input
     this.tagInput.nativeElement.value = '';
 
+    console.log(this.gifsService.tagHistory )
+
   }
 
 }
