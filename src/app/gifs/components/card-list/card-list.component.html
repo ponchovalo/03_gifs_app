@@ -2,13 +2,17 @@
 
 <div class="row">
 <!--De aqui se puede clonar con ngFor-->
-  <div class="col-md-3 col-sm-6">
+  <div  *ngFor="let gif of gifs"  class="col-md-3 col-sm-6">
     <div class="card mb-2 text-center bg-dark">
       <!--Crear Imagen-->
+      <img  [src]="gif.images.downsized_medium.url"
+            [alt]="gif.title"
+            class="card-img-top"
+            >
 
       <div class="card-body text-white">
         <p class="card-text">
-          Hola Mundo
+          {{gif.title}}
         </p>
       </div>
 

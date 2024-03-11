@@ -1,10 +1,13 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Gifs, SearchResponse } from '../interfaces/gifs.interfaces';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GifsService {
+
+  public gifsList: Gifs[] = [];
 
   //API KEY de giphy
   private apiKey: string = "HNrp0XsJKnPGtkS3tPoJxVKMT4EQAC9l";
@@ -13,7 +16,10 @@ export class GifsService {
 
   private _tagHistory: string[] = [];
 
-  constructor( private http: HttpClient ) { }
+  constructor( private http: HttpClient ) {
+
+    this.loadLocalStorage();
+  }
 
   //getter para obtener el arreglo,
   get tagHistory(): string[] {
@@ -33,7 +39,29 @@ export class GifsService {
 
     this._tagHistory = this._tagHistory.splice(0,10);
 
+    //Guardamos en LocalStorage
+    this.saveLocalStorage();
+
   }
+
+  //Metodo para guardar en el LocalStorage
+  private saveLocalStorage(): void{
+    localStorage.setItem('history', JSON.stringify(this._tagHistory));
+  }
+
+  //Metodo para cargar informacion del LocalStorage
+  private loadLocalStorage():void{
+    //Validacion si el localstorage es null
+    if( ! localStorage.getItem('history')) return;
+
+    this._tagHistory = JSON.parse(localStorage.getItem('history')!);
+
+    if(this._tagHistory.length === 0) return;
+
+    this.searchTag(this._tagHistory[0])
+
+  }
+
 
   //metodo unicamente para realizar la busqueda
   searchTag(tag: string): void {
@@ -48,9 +76,11 @@ export class GifsService {
       .set( 'limit', '10')
 
     //La url y los parametros como constantes en la peticion http.get
-    this.http.get(`${this.url}/search`, { params })
+    this.http.get<SearchResponse>(`${this.url}/search`, { params })
       .subscribe( resp => {
-        console.log(resp);
+        this.gifsList = resp.data;
+
+        console.log({gifs: this.gifsList})
       })
 
   }
